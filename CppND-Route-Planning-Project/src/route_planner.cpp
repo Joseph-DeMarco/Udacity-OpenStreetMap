@@ -11,11 +11,8 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 
     // Store the start and end coordinates in this class's start and end node values
     RouteModel m_Model(model); 
-    //std::cout << "Searching for closest map nodes...\n";
     start_node = &m_Model.FindClosestNode(start_x, start_y);
     end_node   = &m_Model.FindClosestNode(end_x, end_y);
-    //std::cout << "Closest map nodea found.\n";
-    
 }
 
 
@@ -65,7 +62,6 @@ RouteModel::Node *RoutePlanner::NextNode() {
   float f = 0.0;
   for (int i = 0; i < open_list.size(); i++) {
     f = open_list[i]->g_value + open_list[i]->h_value;
-    //std::cout << "Open List #" << i << ": " << open_list[i] << " " << f <<"\n";
     if (f <= f_min) {
       f_min = f;
       short_path_idx = i;
@@ -73,7 +69,6 @@ RouteModel::Node *RoutePlanner::NextNode() {
   }
   RouteModel::Node* short_path_node = open_list[short_path_idx];
   open_list.erase(open_list.begin() + short_path_idx);
-  //std::cout << "Shortest Path node is: " << short_path_node << " idx: " << short_path_idx << "\n";
   return short_path_node;
 }
 
@@ -110,50 +105,16 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 // - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
 
 void RoutePlanner::AStarSearch() {
-    RouteModel::Node *current_node = nullptr;
-    //RouteModel::Node *last_node = nullptr;
-    //RouteModel::Node *next_node = nullptr;
+    RouteModel::Node* current_node = nullptr;
     start_node->h_value = CalculateHValue(start_node);
     start_node->g_value = 0.0;
     start_node->visited = true;
     open_list.push_back(start_node);
     current_node = start_node;
-    //AddNeighbors(current_node);
     end_node->h_value = CalculateHValue(end_node);
-    //int count = 0;
-    //float alt_f_value = 0.0;
-    //float alt_g_value = 0.0;
-    //float min_f_value = 0.0;
-    //int   min_f_index = 0;
     while(current_node->h_value != 0.0) {
       current_node = NextNode();
       AddNeighbors(current_node);
-      //last_node = current_node;
-      // cut corners, literally
-      //if (last_node->parent != nullptr) {
-      //  for (int i = 0; i < last_node->parent->neighbors.size(); i++) {
-      //    if (current_node == last_node->parent->neighbors[i]) {
-      //      std::cout << "corner cut\n";
-      //      current_node = last_node->parent->neighbors[i];
-      //      current_node->g_value = current_node->parent->g_value + current_node->distance(*current_node->parent);
-      //    }
-      //  }
-      // }
-      // recalculate the open list g values
-      //for (int i = 0; i < open_list.size(); i++) {
-      //  open_list[i]->g_value = current_node->g_value + current_node->distance(*open_list[i]);
-      //}
-      
-      // reset the open list
-      //for (int i = 0; i < open_list.size(); i++) {
-      //  open_list[i]->visited = false;
-      //}
-      //open_list.erase(open_list.begin(), open_list.end());
-      //count += 1;
-      //std::cout << "move count: " << count << "..............\n";
-      //std::cout << "open list size" << open_list.size() << "\n";
-      //std::cout << "current h_value: " << current_node->h_value << "\n";
-      //std::cout << "current g_value: " << current_node->g_value << "\n";
     }
     m_Model.path = ConstructFinalPath(current_node);
 }
